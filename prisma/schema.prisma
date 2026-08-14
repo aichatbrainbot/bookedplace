@@ -23,10 +23,10 @@ model User {
 model Property {
   id          String   @id @default(uuid())
   title       String
-  description String   @db.Text
+  description String   @db.LongText
   price       Decimal  @db.Decimal(10, 2)
   location    String
-  images      String   @db.Text // JSON string or comma-separated URLs
+  images      String   @db.LongText // JSON string or comma-separated URLs
   category    Category
   rating      Float    @default(0)
   widgetCode  String?  @db.LongText // Raw HTML/JS widget code from Travelpayouts etc.
@@ -55,7 +55,7 @@ model Booking {
 model SiteContent {
   id        Int      @id @default(autoincrement())
   key       String   @unique
-  value     String   @db.Text
+  value     String   @db.LongText
   category  String?
   updatedAt DateTime @updatedAt
 }
@@ -85,9 +85,9 @@ model BlogPost {
   title          String
   slug           String   @unique
   category       String   @default("general")
-  content        String   @db.Text
+  content        String   @db.LongText
   excerpt        String?  @db.Text
-  coverImage     String?
+  coverImage     String?  @db.LongText
 
   // SEO Fields
   seoTitle       String?

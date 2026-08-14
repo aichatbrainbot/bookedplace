@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { updateSiteContent } from '@/app/actions/content'
+import { updateSiteContentBatch } from '@/app/actions/content'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardDescription, CardFooter } from '@/components/ui/card'
@@ -52,17 +52,18 @@ export default function SettingsEditor({ initialContent }: { initialContent: Sit
 
     const handleSave = async () => {
         setIsSaving(true)
-        let tempErrors = 0
-
         try {
-            for (const [key, value] of Object.entries(formData)) {
-                const strValue = typeof value === 'boolean' ? String(value) : value
-                const result = await updateSiteContent(key, strValue)
-                if (!result.success) tempErrors++
-            }
+            const items = Object.entries(formData).map(([key, value]) => ({
+                key,
+                value: typeof value === 'boolean' ? String(value) : value
+            }))
 
-            if (tempErrors === 0) toast.success('Settings updated successfully')
-            else toast.warning('Some settings failed to save')
+            const result = await updateSiteContentBatch(items)
+            if (result.success) {
+                toast.success('Settings updated successfully')
+            } else {
+                toast.error(result.error || 'Failed to save settings')
+            }
         } catch {
             toast.error('Error saving settings')
         } finally {
