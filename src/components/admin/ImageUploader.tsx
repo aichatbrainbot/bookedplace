@@ -35,7 +35,7 @@ export default function ImageUploader({ value, onChange, className }: ImageUploa
                 setPreview(result.url)
                 onChange(result.url)
             } else {
-                alert('Upload failed')
+                alert(result.error || 'Upload failed')
             }
         } catch (error) {
             console.error('Upload error', error)

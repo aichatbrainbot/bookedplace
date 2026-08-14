@@ -1,9 +1,5 @@
 'use server'
 
-import { writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
-import { v4 as uuidv4 } from 'uuid'
-
 export async function uploadImage(formData: FormData) {
     try {
         const file = formData.get('file') as File
@@ -11,23 +7,21 @@ export async function uploadImage(formData: FormData) {
             return { success: false, error: 'No file uploaded' }
         }
 
+        // Limit file size to 4.5MB for serverless payload compatibility
+        if (file.size > 4.5 * 1024 * 1024) {
+            return { success: false, error: 'File size exceeds 4.5MB limit. Please choose a smaller image or paste an external URL.' }
+        }
+
         const bytes = await file.arrayBuffer()
         const buffer = Buffer.from(bytes)
+        const mimeType = file.type || 'image/jpeg'
+        const base64 = buffer.toString('base64')
+        const dataUrl = `data:${mimeType};base64,${base64}`
 
-        // Ensure uploads directory exists
-        const uploadDir = join(process.cwd(), 'public', 'uploads')
-        await mkdir(uploadDir, { recursive: true })
-
-        // Create unique filename
-        const filename = `${uuidv4()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '')}`
-        const filepath = join(uploadDir, filename)
-
-        // Write file
-        await writeFile(filepath, buffer)
-
-        return { success: true, url: `/uploads/${filename}` }
+        return { success: true, url: dataUrl }
     } catch (error) {
         console.error('Upload Error:', error)
         return { success: false, error: 'Upload failed' }
     }
 }
+
