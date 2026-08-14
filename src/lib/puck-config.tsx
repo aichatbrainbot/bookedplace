@@ -61,7 +61,7 @@ export const puckConfig: Config<ComponentProps> = {
                 buttonUrl: '/stays',
                 bgGradient: 'from-slate-900 via-purple-950 to-slate-900',
             },
-            render: ({ title, subtitle, buttonText, buttonUrl, bgGradient }) => (
+            render: ({ title, subtitle, buttonText, buttonUrl, bgGradient }: ComponentProps['Hero']) => (
                 <div className={`w-full py-20 px-6 bg-gradient-to-br ${bgGradient} text-white text-center rounded-2xl my-4 shadow-xl border border-white/10`}>
                     <h1 className="text-4xl sm:text-5xl font-black tracking-tight mb-4 max-w-3xl mx-auto">{title}</h1>
                     <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-8 font-light">{subtitle}</p>
@@ -102,7 +102,7 @@ export const puckConfig: Config<ComponentProps> = {
                 level: 'h2',
                 align: 'left',
             },
-            render: ({ title, level, align }) => {
+            render: ({ title, level, align }: ComponentProps['Heading']) => {
                 const alignClass = align === 'center' ? 'text-center' : align === 'right' ? 'text-right' : 'text-left'
                 if (level === 'h1') return <h1 className={`text-4xl font-extrabold my-6 ${alignClass}`}>{title}</h1>
                 if (level === 'h3') return <h3 className={`text-xl font-bold my-4 ${alignClass}`}>{title}</h3>
@@ -126,7 +126,7 @@ export const puckConfig: Config<ComponentProps> = {
                 text: 'Add your paragraph content here. Puck allows full inline text customization.',
                 align: 'left',
             },
-            render: ({ text, align }) => (
+            render: ({ text, align }: ComponentProps['Text']) => (
                 <p className={`text-base text-gray-700 dark:text-gray-300 leading-relaxed my-3 ${align === 'center' ? 'text-center' : align === 'right' ? 'text-right' : 'text-left'}`}>
                     {text}
                 </p>
@@ -151,7 +151,7 @@ export const puckConfig: Config<ComponentProps> = {
                 url: '#',
                 variant: 'primary',
             },
-            render: ({ text, url, variant }) => {
+            render: ({ text, url, variant }: ComponentProps['Button']) => {
                 const btnStyle = variant === 'outline'
                     ? 'border-2 border-primary text-primary hover:bg-primary/10'
                     : variant === 'secondary'
@@ -179,7 +179,7 @@ export const puckConfig: Config<ComponentProps> = {
                 alt: 'Travel Image',
                 caption: 'Beautiful travel destination',
             },
-            render: ({ src, alt, caption }) => (
+            render: ({ src, alt, caption }: ComponentProps['Image']) => (
                 <div className="my-6">
                     <img src={src} alt={alt} className="w-full max-h-[450px] object-cover rounded-2xl shadow-md" />
                     {caption && <p className="text-xs text-center text-gray-500 mt-2 font-medium">{caption}</p>}
@@ -191,6 +191,7 @@ export const puckConfig: Config<ComponentProps> = {
             fields: {
                 columns: {
                     type: 'array',
+                    getItemTitle: (item, idx) => item.title || `Column ${idx + 1}`,
                     arrayFields: {
                         title: { type: 'text' },
                         description: { type: 'textarea' },
@@ -204,9 +205,9 @@ export const puckConfig: Config<ComponentProps> = {
                     { title: 'Top Activities', description: 'Discover unmissable local experiences and tours.' },
                 ]
             },
-            render: ({ columns }) => (
+            render: ({ columns }: ComponentProps['Columns']) => (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-8">
-                    {columns?.map((col, idx) => (
+                    {columns?.map((col: { title: string; description: string }, idx: number) => (
                         <div key={idx} className="p-6 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
                             <h4 className="font-bold text-lg mb-2 text-gray-900 dark:text-gray-100">{col.title}</h4>
                             <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{col.description}</p>
@@ -225,7 +226,7 @@ export const puckConfig: Config<ComponentProps> = {
                 html: '<div className="p-4 bg-purple-50 text-purple-900 rounded-lg">Custom HTML Block</div>',
                 css: '',
             },
-            render: ({ html, css }) => (
+            render: ({ html, css }: ComponentProps['CustomHtml']) => (
                 <div className="my-4">
                     {css && <style dangerouslySetInnerHTML={{ __html: css }} />}
                     {html && <div dangerouslySetInnerHTML={{ __html: html }} />}

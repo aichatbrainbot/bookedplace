@@ -13,6 +13,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@measured/puck": "^0.20.2",
     "@prisma/client": "^5.10.0",
     "@puckeditor/core": "^0.23.0",
     "@radix-ui/react-avatar": "^1.1.11",
