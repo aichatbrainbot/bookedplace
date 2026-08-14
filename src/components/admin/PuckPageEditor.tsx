@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Puck, Data } from '@measured/puck'
-import '@measured/puck/puck.css'
+import { Puck, Data } from '@puckeditor/core'
+import '@puckeditor/core/dist/index.css'
 import { puckConfig } from '@/lib/puck-config'
 import { updateCustomPageContent } from '@/app/actions/customPages'
 import { toast } from 'sonner'

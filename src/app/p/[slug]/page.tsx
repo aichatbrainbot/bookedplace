@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getCustomPageBySlug } from '@/app/actions/customPages'
 import { Metadata } from 'next'
-import { Render, Data } from '@measured/puck'
+import { Render, Data } from '@puckeditor/core'
 import { puckConfig } from '@/lib/puck-config'
 
 export const dynamic = 'force-dynamic'

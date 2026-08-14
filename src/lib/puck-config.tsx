@@ -1,5 +1,5 @@
 import React from 'react'
-import type { Config } from '@measured/puck'
+import type { Config } from '@puckeditor/core'
 
 export type ComponentProps = {
     Hero: {
