@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation'
 import { getCustomPageBySlug } from '@/app/actions/customPages'
 import { Metadata } from 'next'
+import { Render, Data } from '@measured/puck'
+import { puckConfig } from '@/lib/puck-config'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,11 +27,38 @@ export default async function CustomDynamicPage({ params }: Props) {
 
     if (!result.success || !result.data) {
         notFound()
-        // notFound() throws, this is unreachable but needed for TypeScript
         return null
     }
 
     const { html, css, isFullPage } = result.data
+
+    // Check if html contains Puck JSON data
+    let puckData: Data | null = null
+    try {
+        if (html && html.trim().startsWith('{')) {
+            puckData = JSON.parse(html)
+        }
+    } catch {
+        puckData = null
+    }
+
+    if (puckData && puckData.content) {
+        if (isFullPage) {
+            return (
+                <div style={{ position: 'fixed', inset: 0, zIndex: 9999, overflowY: 'auto', background: '#fff' }}>
+                    <Render config={puckConfig} data={puckData} />
+                </div>
+            )
+        }
+
+        return (
+            <div className="w-full min-h-screen pt-24 pb-12">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <Render config={puckConfig} data={puckData} />
+                </div>
+            </div>
+        )
+    }
 
     if (isFullPage) {
         // Full Page: fixed overlay that covers the navbar and footer completely
@@ -37,7 +66,7 @@ export default async function CustomDynamicPage({ params }: Props) {
             <div style={{ position: 'fixed', inset: 0, zIndex: 9999, overflowY: 'auto', background: '#fff' }}>
                 {css && <style dangerouslySetInnerHTML={{ __html: css }} />}
                 {html ? (
-                    <div dangerouslySetInnerHTML={{ __html: html }} className="grapesjs-content-wrapper" />
+                    <div dangerouslySetInnerHTML={{ __html: html }} />
                 ) : (
                     <div className="flex items-center justify-center min-h-screen text-gray-400 text-sm">
                         This page is empty. Edit it in the CMS to add content.
@@ -54,7 +83,7 @@ export default async function CustomDynamicPage({ params }: Props) {
                 {css && <style dangerouslySetInnerHTML={{ __html: css }} />}
 
                 {html ? (
-                    <div dangerouslySetInnerHTML={{ __html: html }} className="grapesjs-content-wrapper" />
+                    <div dangerouslySetInnerHTML={{ __html: html }} />
                 ) : (
                     <div className="flex items-center justify-center min-h-[50vh] text-gray-400 border-2 border-dashed rounded-xl text-sm">
                         This page is empty. Edit it in the CMS to add content.

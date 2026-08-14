@@ -2,7 +2,7 @@ import { getCustomPageById } from '@/app/actions/customPages'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
-import CodePageEditor from '@/components/admin/CodePageEditor'
+import PuckPageEditor from '@/components/admin/PuckPageEditor'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,7 +26,7 @@ export default async function EditCustomPage({ params }: { params: Promise<{ id:
                 <span className="text-sm font-medium text-muted-foreground">Back to Custom Pages</span>
             </div>
 
-            <CodePageEditor
+            <PuckPageEditor
                 id={customPage.id}
                 title={customPage.title}
                 slug={customPage.slug}
