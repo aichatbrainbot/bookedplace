@@ -1,12 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { updateCustomPageContent } from '@/app/actions/customPages'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
-import { Code, Eye, Save, Sparkles, ExternalLink, Monitor, Smartphone, Tablet, Copy, Check } from 'lucide-react'
+import { Code, Eye, Save, ExternalLink, Monitor, Smartphone, Tablet, Copy, Check, Layout, Maximize2 } from 'lucide-react'
 
 interface CodePageEditorProps {
     id: string
@@ -21,14 +23,14 @@ export default function CodePageEditor({
     id,
     title,
     slug,
-    isFullPage,
+    isFullPage: initialIsFullPage,
     initialHtml,
     initialCss
 }: CodePageEditorProps) {
     const [html, setHtml] = useState(initialHtml || '')
     const [css, setCss] = useState(initialCss || '')
+    const [isFullPage, setIsFullPage] = useState(initialIsFullPage || false)
     const [activeTab, setActiveTab] = useState<'editor' | 'preview'>('editor')
-    const [codeTab, setCodeTab] = useState<'html' | 'css'>('html')
     const [previewDevice, setPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
     const [isSaving, setIsSaving] = useState(false)
     const [copied, setCopied] = useState(false)
@@ -36,9 +38,9 @@ export default function CodePageEditor({
     const handleSave = async () => {
         setIsSaving(true)
         try {
-            const result = await updateCustomPageContent(id, html, css)
+            const result = await updateCustomPageContent(id, html, css, isFullPage)
             if (result.success) {
-                toast.success('Page code saved successfully!')
+                toast.success('Full Page Code saved successfully!')
             } else {
                 toast.error(result.error || 'Failed to save page code.')
             }
@@ -70,26 +72,45 @@ export default function CodePageEditor({
             {/* Header Toolbar */}
             <div className="flex flex-wrap items-center justify-between gap-4 bg-card border border-border p-4 rounded-xl shadow-sm">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 bg-primary/10 text-primary rounded-lg">
+                    <div className="p-2.5 bg-primary/10 text-primary rounded-xl">
                         <Code size={22} />
                     </div>
                     <div>
                         <h2 className="font-bold text-lg leading-snug">{title}</h2>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <span>URL: <code className="bg-muted px-1.5 py-0.5 rounded text-primary">/p/{slug}</code></span>
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
+                            <span>URL: <code className="bg-muted px-1.5 py-0.5 rounded text-primary font-mono">/p/{slug}</code></span>
+                            <span>•</span>
                             <a
                                 href={`/p/${slug}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center gap-1 text-blue-600 hover:underline font-medium"
                             >
-                                Open Page <ExternalLink size={12} />
+                                Open Live Page <ExternalLink size={12} />
                             </a>
                         </div>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-4">
+                    {/* Full Page Layout Mode Toggle */}
+                    <div className="flex items-center space-x-2 bg-muted/30 px-3 py-1.5 rounded-lg border border-border/60">
+                        <Maximize2 size={15} className={isFullPage ? "text-primary" : "text-muted-foreground"} />
+                        <div className="flex flex-col">
+                            <Label htmlFor="fullpage-mode" className="text-xs font-bold cursor-pointer">
+                                {isFullPage ? 'Full Page Mode (No Header/Footer)' : 'Standard Mode (With Header/Footer)'}
+                            </Label>
+                            <span className="text-[10px] text-muted-foreground">
+                                {isFullPage ? 'Takes over entire screen (100% full custom page)' : 'Embedded inside site header & footer'}
+                            </span>
+                        </div>
+                        <Switch
+                            id="fullpage-mode"
+                            checked={isFullPage}
+                            onCheckedChange={setIsFullPage}
+                        />
+                    </div>
+
                     <Button
                         variant="outline"
                         size="sm"
@@ -106,7 +127,7 @@ export default function CodePageEditor({
                         className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm"
                     >
                         <Save size={16} />
-                        {isSaving ? 'Saving Code...' : 'Save Page Code'}
+                        {isSaving ? 'Saving Code...' : 'Save Full Page Code'}
                     </Button>
                 </div>
             </div>
@@ -116,7 +137,7 @@ export default function CodePageEditor({
                 <div className="flex items-center justify-between border-b border-border pb-2">
                     <TabsList className="bg-muted/50 p-1 rounded-lg">
                         <TabsTrigger value="editor" className="gap-2 text-xs font-semibold">
-                            <Code size={14} /> Code Editor (HTML & CSS)
+                            <Code size={14} /> Full Code Editor (HTML & CSS & JS)
                         </TabsTrigger>
                         <TabsTrigger value="preview" className="gap-2 text-xs font-semibold">
                             <Eye size={14} /> Live Preview
@@ -160,21 +181,21 @@ export default function CodePageEditor({
                 <TabsContent value="editor" className="mt-4 space-y-4">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         {/* HTML Box */}
-                        <Card className="border border-border shadow-sm flex flex-col h-[600px]">
+                        <Card className="border border-border shadow-sm flex flex-col h-[620px]">
                             <CardHeader className="py-3 px-4 bg-muted/30 border-b border-border flex flex-row items-center justify-between">
                                 <div>
                                     <CardTitle className="text-sm font-bold flex items-center gap-2 text-orange-600">
-                                        <span className="bg-orange-500/10 text-orange-600 px-2 py-0.5 rounded text-xs">HTML</span>
-                                        Structure & Markup
+                                        <span className="bg-orange-500/10 text-orange-600 px-2 py-0.5 rounded text-xs font-mono">HTML</span>
+                                        HTML Markup & Structure
                                     </CardTitle>
-                                    <CardDescription className="text-xs">HTML elements, text, divs, and images</CardDescription>
+                                    <CardDescription className="text-xs">HTML elements, sections, text, images, and &lt;script&gt; tags</CardDescription>
                                 </div>
                             </CardHeader>
                             <CardContent className="p-0 flex-1 relative bg-[#1e1e1e] rounded-b-xl overflow-hidden">
                                 <textarea
                                     value={html}
                                     onChange={(e) => setHtml(e.target.value)}
-                                    placeholder="<!-- Write your HTML code here -->&#10;<div class='custom-hero'>&#10;  <h1>Welcome to my page</h1>&#10;  <p>Custom HTML content...</p>&#10;</div>"
+                                    placeholder="<!-- Write full HTML markup here -->&#10;<div class='hero-section'>&#10;  <h1>My Full Custom Page</h1>&#10;  <p>Full control over layout and elements.</p>&#10;</div>"
                                     className="w-full h-full p-4 font-mono text-xs text-gray-100 bg-transparent resize-none focus:outline-none leading-relaxed"
                                     spellCheck={false}
                                 />
@@ -182,21 +203,21 @@ export default function CodePageEditor({
                         </Card>
 
                         {/* CSS Box */}
-                        <Card className="border border-border shadow-sm flex flex-col h-[600px]">
+                        <Card className="border border-border shadow-sm flex flex-col h-[620px]">
                             <CardHeader className="py-3 px-4 bg-muted/30 border-b border-border flex flex-row items-center justify-between">
                                 <div>
                                     <CardTitle className="text-sm font-bold flex items-center gap-2 text-blue-600">
-                                        <span className="bg-blue-500/10 text-blue-600 px-2 py-0.5 rounded text-xs">CSS</span>
-                                        Styles & Animations
+                                        <span className="bg-blue-500/10 text-blue-600 px-2 py-0.5 rounded text-xs font-mono">CSS</span>
+                                        Full Page Styles & Design
                                     </CardTitle>
-                                    <CardDescription className="text-xs">Custom CSS styles, colors, layouts</CardDescription>
+                                    <CardDescription className="text-xs">Custom CSS styles, colors, responsiveness, animations</CardDescription>
                                 </div>
                             </CardHeader>
                             <CardContent className="p-0 flex-1 relative bg-[#1e1e1e] rounded-b-xl overflow-hidden">
                                 <textarea
                                     value={css}
                                     onChange={(e) => setCss(e.target.value)}
-                                    placeholder="/* Write your custom CSS here */&#10;.custom-hero {&#10;  background: #111;&#10;  color: #fff;&#10;  padding: 40px;&#10;  border-radius: 12px;&#10;}"
+                                    placeholder="/* Write custom CSS styles here */&#10;body {&#10;  background-color: #0f172a;&#10;  color: #ffffff;&#10;}&#10;.hero-section {&#10;  padding: 80px 20px;&#10;  text-align: center;&#10;}"
                                     className="w-full h-full p-4 font-mono text-xs text-blue-300 bg-transparent resize-none focus:outline-none leading-relaxed"
                                     spellCheck={false}
                                 />
@@ -207,19 +228,19 @@ export default function CodePageEditor({
 
                 {/* Preview Content */}
                 <TabsContent value="preview" className="mt-4">
-                    <div className="flex justify-center w-full min-h-[600px] bg-muted/30 p-6 rounded-xl border border-border overflow-auto">
-                        <div className={`bg-white text-gray-900 rounded-lg shadow-lg border border-border overflow-hidden transition-all duration-300 ${getDeviceWidth()}`}>
+                    <div className="flex justify-center w-full min-h-[650px] bg-muted/30 p-6 rounded-xl border border-border overflow-auto">
+                        <div className={`bg-white text-gray-900 rounded-lg shadow-xl border border-border overflow-hidden transition-all duration-300 ${getDeviceWidth()}`}>
                             <div className="bg-gray-100 px-4 py-2 border-b border-gray-200 flex items-center justify-between text-xs text-gray-500 font-mono">
-                                <span>Preview: /p/{slug}</span>
-                                <span>{previewDevice.toUpperCase()} MODE</span>
+                                <span>Previewing: /p/{slug} ({isFullPage ? 'Full Screen Overlay' : 'Standard Body'})</span>
+                                <span>{previewDevice.toUpperCase()}</span>
                             </div>
                             <div className="p-6">
                                 {css && <style dangerouslySetInnerHTML={{ __html: css }} />}
                                 {html ? (
                                     <div dangerouslySetInnerHTML={{ __html: html }} />
                                 ) : (
-                                    <div className="flex items-center justify-center py-20 text-gray-400 text-sm border-2 border-dashed rounded-lg">
-                                        No HTML code added yet. Switch to Code Editor to add content.
+                                    <div className="flex items-center justify-center py-24 text-gray-400 text-sm border-2 border-dashed rounded-lg">
+                                        No HTML code written yet. Switch to Code Editor to build your full page.
                                     </div>
                                 )}
                             </div>

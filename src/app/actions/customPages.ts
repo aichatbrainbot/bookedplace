@@ -77,13 +77,14 @@ export async function getCustomPageBySlug(slug: string) {
     }
 }
 
-export async function updateCustomPageContent(id: string, html: string, css: string) {
+export async function updateCustomPageContent(id: string, html: string, css: string, isFullPage?: boolean) {
     try {
         const page = await prisma.customPage.update({
             where: { id },
             data: {
                 html,
-                css
+                css,
+                ...(typeof isFullPage === 'boolean' ? { isFullPage } : {})
             }
         })
 
