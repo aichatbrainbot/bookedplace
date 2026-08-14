@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { ArrowRight, Layout, Plane, Building, Globe, Car, Bus, BookOpen, Phone, Shield, FileText, Info } from 'lucide-react'
+import { ArrowRight, Layout, Plane, BookOpen, Phone, Shield, FileText, Info } from 'lucide-react'
 
 const pages = [
     { id: 'custom', title: 'Custom Pages', description: 'Create and manage dynamic pages with GrapesJS', icon: Layout },
