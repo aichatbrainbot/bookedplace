@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `user` ADD COLUMN `lastLoginAt` DATETIME(3) NULL,
+    MODIFY `role` ENUM('USER', 'ADMIN', 'EDITOR', 'VIEWER') NOT NULL DEFAULT 'USER';
