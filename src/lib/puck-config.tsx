@@ -191,7 +191,6 @@ export const puckConfig: Config<ComponentProps> = {
             fields: {
                 columns: {
                     type: 'array',
-                    getItemTitle: (item, idx) => item.title || `Column ${idx + 1}`,
                     arrayFields: {
                         title: { type: 'text' },
                         description: { type: 'textarea' },
