@@ -2,8 +2,9 @@ import { getCustomPages } from '@/app/actions/customPages'
 import Link from 'next/link'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Plus, Edit, Globe, Trash2 } from 'lucide-react'
+import { Edit, Globe } from 'lucide-react'
 import CreateCustomPageDialog from './CreateCustomPageDialog'
+import DeleteCustomPageButton from './DeleteCustomPageButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,7 +17,7 @@ export default async function CustomPagesList() {
             <div className="flex justify-between items-center">
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight">Custom Pages</h2>
-                    <p className="text-muted-foreground">Manage your dynamically created GrapesJS pages.</p>
+                    <p className="text-muted-foreground">Manage and edit your custom dynamic pages.</p>
                 </div>
                 <CreateCustomPageDialog />
             </div>
@@ -25,7 +26,7 @@ export default async function CustomPagesList() {
                 <Card className="text-center p-12 bg-gray-50 border-dashed">
                     <CardHeader>
                         <CardTitle className="text-gray-500">No Custom Pages Yet</CardTitle>
-                        <CardDescription>Click the button above to create your first custom dynamic page.</CardDescription>
+                        <CardDescription>Click the button above to create your first custom page.</CardDescription>
                     </CardHeader>
                 </Card>
             ) : (
@@ -35,15 +36,18 @@ export default async function CustomPagesList() {
                             <CardHeader className="flex-grow">
                                 <CardTitle className="flex justify-between items-start text-lg">
                                     <span className="truncate pr-2">{page.title}</span>
-                                    {page.isFullPage ? (
-                                        <span className="text-xs bg-purple-100 text-purple-700 font-semibold px-2 py-1 rounded-full whitespace-nowrap">
-                                            Full Page
-                                        </span>
-                                    ) : (
-                                        <span className="text-xs bg-blue-100 text-blue-700 font-semibold px-2 py-1 rounded-full whitespace-nowrap">
-                                            Standard Body
-                                        </span>
-                                    )}
+                                    <div className="flex items-center gap-1.5">
+                                        {page.isFullPage ? (
+                                            <span className="text-xs bg-purple-100 text-purple-700 font-semibold px-2 py-1 rounded-full whitespace-nowrap">
+                                                Full Page
+                                            </span>
+                                        ) : (
+                                            <span className="text-xs bg-blue-100 text-blue-700 font-semibold px-2 py-1 rounded-full whitespace-nowrap">
+                                                Standard Body
+                                            </span>
+                                        )}
+                                        <DeleteCustomPageButton id={page.id} title={page.title} />
+                                    </div>
                                 </CardTitle>
                                 <CardDescription className="font-mono text-xs mt-1">
                                     /p/{page.slug}
@@ -60,7 +64,7 @@ export default async function CustomPagesList() {
                                 <Link href={`/admin/cms/custom/${page.id}`}>
                                     <Button variant="default" size="sm" className="gap-2 bg-black hover:bg-gray-800 text-white">
                                         <Edit className="w-4 h-4" />
-                                        Edit Design
+                                        Edit Code
                                     </Button>
                                 </Link>
                             </CardContent>
